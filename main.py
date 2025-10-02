@@ -1,8 +1,8 @@
 import functions_framework
 from flask import Request
-from neon_db import insert_sudoku_result
 
-from claude import process_screenshot
+from claude_api import process_screenshot
+from database import insert_sudoku_result
 from google_drive import get_file_metadata, get_screenshot
 from google_utils import get_secret
 from models import WebhookPayload

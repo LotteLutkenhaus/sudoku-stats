@@ -2,6 +2,8 @@
 
 A serverless application that automatically tracks and stores completion statistics for the Sudoku puzzle in the New York Times games app. 
 
+Results are stored in a database, and displayed in Grafana. My personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de). 
+
 ## Architecture Overview
 
 This application processes screenshots of completed NYT Sudoku puzzles through the following workflow:
@@ -52,7 +54,7 @@ Follow the [Google Cloud Run continuous deployment guide](https://cloud.google.c
 
 ## Database
 
-The application uses PostgreSQL hosted on Neon for data persistence. The schema includes:
+The application uses PostgreSQL hosted on Neon for data storage. The schema includes:
 - Puzzle completion timestamps
 - Solving duration (stored as PostgreSQL interval)
 - Difficulty levels (easy, medium, hard)
@@ -61,7 +63,8 @@ The application uses PostgreSQL hosted on Neon for data persistence. The schema 
 ## Webhooks
 
 I personally use [Make](https://www.make.com/en) to watch the Google Drive folder that I store my
-Sudoku screenshots in. When setting this up, make sure to add a 'X-API-Key' header for authentication.
+Sudoku screenshots in. When it finds a new screenshot, it fires a webhook to the Google Cloud Run
+address. When setting up the webhook, make sure to add a 'X-API-Key' header for authentication.
 
 ## Required Secrets in Google Secret Manager
 
