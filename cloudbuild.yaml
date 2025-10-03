@@ -24,7 +24,7 @@ steps:
         if [ "$BRANCH_NAME" = "main" ]; then
           gcloud run deploy sudoku-stats \
             --image gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA \
-            --region YOUR_REGION \
+            --region europe-west1 \
             --platform managed \
             --allow-unauthenticated \
             --timeout 3000
