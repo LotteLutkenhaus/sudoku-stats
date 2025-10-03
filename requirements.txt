@@ -3,21 +3,10 @@ google-cloud-secret-manager==2.20.2
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
-google-cloud-storage
-google-cloud-bigquery
-cloud-sql-python-connector
-pg8000>=1.29.0  # A pure Python PostgreSQL driver that works well with Cloud SQL
 pydantic==2.9.2
-beautifulsoup4
-pytz
-opnieuw
 functions-framework==3.*
 Flask==3.0.3
 anthropic>=0.18.0
 Pillow>=11.3.0
 sqlalchemy==2.0.27
 psycopg2-binary==2.9.9
-pre-commit==3.8.0
-ruff==0.6.9
-mypy==1.11.2
-types-request
