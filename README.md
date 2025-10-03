@@ -2,7 +2,7 @@
 
 A serverless application that automatically tracks and stores completion statistics for the Sudoku puzzle in the [New York Times games](https://www.nytco.com/games/) mobile app. 
 
-Results are stored in a database, and displayed in Grafana. My personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de). 
+Results can be displayed in Grafana; my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de). 
 
 ## Architecture Overview
 
