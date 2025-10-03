@@ -2,7 +2,7 @@
 
 A serverless application that automatically tracks and stores completion statistics for the Sudoku puzzle in the [New York Times games](https://www.nytco.com/games/) mobile app. 
 
-Results can be displayed in Grafana; my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de). 
+Results can be displayed in Grafana; my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
 
 ## Architecture Overview
 
@@ -47,7 +47,10 @@ Follow the [Google Cloud Run continuous deployment guide](https://cloud.google.c
 - **Timeout**: 3000 seconds (adjust as needed)
 
 #### Security
-- **Service Account**: Select your designated service account with appropriate permissions (at least secret manager accessor)
+- **Service Account**: Select your designated service account with appropriate permissions, at least:
+    - Secret accessor
+    - Logs writer
+    - Artifact registry writer + createOnPush
 
 #### Environment Variables
 - None needed
