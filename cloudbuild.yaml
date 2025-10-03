@@ -1,0 +1,39 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sudoku-stats:latest'
+      - '.'
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA'
+
+  # Deploy to Cloud Run (only on main branch)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        if [ "$BRANCH_NAME" = "main" ]; then
+          gcloud run deploy sudoku-stats \
+            --image gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA \
+            --region YOUR_REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --timeout 3000
+        else
+          echo "Skipping deployment - not on main branch"
+        fi
+
+images:
+  - 'gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
