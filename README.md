@@ -55,6 +55,18 @@ Follow the [Google Cloud Run continuous deployment guide](https://cloud.google.c
 #### Environment Variables
 - None needed
 
+#### Artifact Registry Cleanup Policy
+To avoid accumulating old Docker images and incurring unnecessary storage costs:
+1. Go to **Artifact Registry** → **Repositories** in Google Cloud Console
+2. Select your repository (e.g., `gcr.io` in the `us` location)
+3. Click **"Edit repository"**
+4. Add a cleanup policy:
+   - **Action**: Delete
+   - **Keep most recent versions**: 5
+5. Save the repository
+
+This will automatically delete old images, keeping only the 5 most recent versions.
+
 ## Database
 
 The application uses PostgreSQL hosted on Neon for data storage. The schema includes:
