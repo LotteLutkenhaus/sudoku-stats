@@ -23,39 +23,45 @@ This application processes screenshots of completed NYT Sudoku puzzles through t
 
 ## Deployment to Google Cloud Run
 
-The application is configured for continuous deployment from GitHub to Google Cloud Run.
+The application uses automated continuous deployment from GitHub to Google Cloud Run via Cloud Build triggers.
 
-### Initial Setup
+### Setting Up Cloud Build Triggers
 
-Follow the [Google Cloud Run continuous deployment guide](https://cloud.google.com/run/docs/quickstarts/deploy-continuously).
+1. **Create Cloud Build Trigger**
+   - Go to [Cloud Build Triggers](https://console.cloud.google.com/cloud-build/triggers) in Google Cloud Console
+   - Click **"Create Trigger"**
+   - Connect GitHub repository
+   - Configure trigger settings:
+     - **Event**: Push to a branch
+     - **Branch**: `^main$` (for production) or `.*` (for all branches/PRs)
+     - **Configuration**: Cloud Build configuration file (YAML)
+     - **Location**: `cloudbuild.yaml`
 
-### Configuration Deviations
+2. **Configure Substitution Variables**
+   - In the trigger settings, add substitution variables:
+     - `_SERVICE_ACCOUNT_EMAIL`: Your service account email (e.g., `your-sa@sudoku-tracker.iam.gserviceaccount.com`)
+   - These variables are used in `cloudbuild.yaml` for deployment
 
-#### Cloud Build
-- Uses a custom Dockerfile instead of Google buildpacks
-- The Dockerfile specifies the Functions Framework entry point
+3. **Deployment Configuration**
+   - The `cloudbuild.yaml` file controls all deployment settings:
+     - **Region**: `europe-west1`
+     - **Timeout**: 3000 seconds
+     - **Authentication**: Unauthenticated invocations allowed
+     - **Platform**: Managed
+   - Deployment only occurs on pushes to the `main` branch
+   - PRs and other branches will build and push images but skip deployment
 
-#### Authentication
-- Allow unauthenticated invocations. 
+### Service Account Permissions
 
-#### Container Settings
-- **Port**: 8080
-- **Command**: Leave blank (uses Dockerfile CMD)
-- **Arguments**: Leave blank
+Your service account needs the following IAM roles:
+- **Secret Manager Secret Accessor** - To access secrets at runtime
+- **Logs Writer** - To write Cloud Run logs
+- **Artifact Registry Writer** - To push Docker images
+- **Artifact Registry Create-on-Push Writer** - To create repositories automatically
+- **Cloud Run Admin** - To deploy the service (if using service account for Cloud Build)
 
-#### Request Configuration
-- **Timeout**: 3000 seconds (adjust as needed)
+### Artifact Registry Cleanup Policy
 
-#### Security
-- **Service Account**: Select your designated service account with appropriate permissions, at least:
-    - Secret accessor
-    - Logs writer
-    - Artifact registry writer + createOnPush
-
-#### Environment Variables
-- None needed
-
-#### Artifact Registry Cleanup Policy
 To avoid accumulating old Docker images and incurring unnecessary storage costs:
 1. Go to **Artifact Registry** → **Repositories** in Google Cloud Console
 2. Select your repository (e.g., `gcr.io` in the `us` location)
