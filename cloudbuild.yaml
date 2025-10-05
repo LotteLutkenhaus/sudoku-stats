@@ -9,6 +9,7 @@ steps:
       - 'gcr.io/$PROJECT_ID/sudoku-stats:latest'
       - '.'
 
+
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -32,8 +33,14 @@ steps:
           echo "Skipping deployment - not on main branch"
         fi
 
+
 images:
   - 'gcr.io/$PROJECT_ID/sudoku-stats:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/$_SERVICE_ACCOUNT_EMAIL'
+
+substitutions:
+  _SERVICE_ACCOUNT_EMAIL: ${_SERVICE_ACCOUNT_EMAIL}
