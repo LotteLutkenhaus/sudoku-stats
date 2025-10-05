@@ -53,12 +53,12 @@ The application uses automated continuous deployment from GitHub to Google Cloud
 
 ### Service Account Permissions
 
-Your service account needs the following IAM roles:
-- **Secret Manager Secret Accessor** - To access secrets at runtime
-- **Logs Writer** - To write Cloud Run logs
-- **Artifact Registry Writer** - To push Docker images
-- **Artifact Registry Create-on-Push Writer** - To create repositories automatically
-- **Cloud Run Admin** - To deploy the service (if using service account for Cloud Build)
+Your service account needs at least the following IAM roles:
+- **Secret Manager Secret Accessor** (`roles/secretmanager.secretAccessor`) - To access secrets at runtime
+- **Logs Writer** (`roles/logging.logWriter`) - To write Cloud Run logs
+- **Artifact Registry Writer** (`roles/artifactregistry.writer`) - To push Docker images
+- **Artifact Registry Create-on-Push Writer** (`roles/artifactregistry.createOnPushWriter`) - To create repositories automatically
+- **Cloud Run Admin** (`roles/run.admin`) - To deploy the service via Cloud Build
 
 ### Artifact Registry Cleanup Policy
 

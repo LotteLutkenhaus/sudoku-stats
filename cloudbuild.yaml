@@ -28,6 +28,7 @@ steps:
             --region europe-west1 \
             --platform managed \
             --allow-unauthenticated \
+            --service-account $_SERVICE_ACCOUNT_EMAIL \
             --timeout 3000
         else
           echo "Skipping deployment - not on main branch"
