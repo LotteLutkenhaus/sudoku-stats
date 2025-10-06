@@ -1,5 +1,4 @@
 import base64
-import json
 
 from anthropic import Anthropic
 from anthropic.types import (
@@ -34,8 +33,7 @@ def _parse_claude_response(raw_response: str) -> ParsedSudokuResult:
     `'\n    "difficulty_level": "Hard",\n    "time_to_solve": "12:37"\n}'`
     """
     full_json = "{" + raw_response
-    parsed_json = json.loads(full_json.strip())
-    parsed_response: ParsedSudokuResult = ParsedSudokuResult.model_validate_json(parsed_json)
+    parsed_response: ParsedSudokuResult = ParsedSudokuResult.model_validate_json(full_json.strip())
     return parsed_response
 
 
