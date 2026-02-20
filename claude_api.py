@@ -63,7 +63,7 @@ def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
     ]
 
     message = client.messages.create(
-        model="claude-3-5-haiku-latest",  # cheapest available model, but up to the task
+        model="claude-haiku-4-5",  # cheapest available model, but up to the task
         max_tokens=100,
         messages=messages,
     )
