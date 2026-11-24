@@ -14,8 +14,7 @@ from sqlalchemy import (
     create_engine,
     func,
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from google_utils import get_secret
 from models import ParsedSudokuResult, ScreenshotMetadata
