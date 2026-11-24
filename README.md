@@ -5,9 +5,11 @@ A serverless application that automatically tracks and stores completion statist
 How I use this: 
 - After solving the daily puzzle, I upload a screenshot of the results screen to Google Drive. 
 - In [Make](https://www.make.com/en) an automation runs that picks up new screenshots, and sends a webhook to this service when that happens. 
-- When this service is triggered, it sends the screenshot to the Athropic API with the request to extract the difficulty level and solving time from it. 
+- When this service is triggered, it sends the screenshot to the Anthropic API with the request to extract the difficulty level and solving time from it. 
 - The result is stored in a database. 
 - The database is available in Grafana, my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
+
+![Grafana dashboard with Sudoku solving times](docs/dashboard.png)
 
 ## Architecture Overview
 
