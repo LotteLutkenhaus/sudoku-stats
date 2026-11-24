@@ -3,7 +3,12 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from models import ParsedSudokuResult, ScreenshotMetadata, SudokuDifficulty
+from models import (
+    ClaudeSudokuExtraction,
+    ParsedSudokuResult,
+    ScreenshotMetadata,
+    SudokuDifficulty,
+)
 
 
 @pytest.mark.parametrize(
@@ -41,3 +46,21 @@ def test_screenshot_metadata_parses_google_timestamp() -> None:
         {"imageMediaMetadata": {"time": "2025:03:14 21:45:09"}}
     )
     assert metadata.metadata.time == datetime(2025, 3, 14, 21, 45, 9)
+
+
+def test_claude_extraction_converts_to_parsed_result() -> None:
+    extraction = ClaudeSudokuExtraction(difficulty_level="Hard", time_to_solve="12:37")
+    result = ParsedSudokuResult.model_validate(extraction.model_dump())
+    assert result.difficulty_level == SudokuDifficulty.HARD
+    assert result.time_to_solve == 757
+
+
+@pytest.mark.parametrize(
+    ("raw_difficulty", "raw_time"),
+    [("Expert", "12:37"), ("hard", "12:37"), ("Hard", "12"), ("Hard", "12:3")],
+)
+def test_claude_extraction_rejects_unexpected_values(raw_difficulty: str, raw_time: str) -> None:
+    with pytest.raises(ValidationError):
+        ClaudeSudokuExtraction.model_validate(
+            {"difficulty_level": raw_difficulty, "time_to_solve": raw_time}
+        )
