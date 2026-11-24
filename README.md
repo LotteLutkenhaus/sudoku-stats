@@ -2,7 +2,12 @@
 
 A serverless application that automatically tracks and stores completion statistics for the Sudoku puzzle in the [New York Times games](https://www.nytco.com/games/) mobile app. 
 
-Results can be displayed in Grafana; my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
+How I use this: 
+- After solving the daily puzzle, I upload a screenshot of the results screen to Google Drive. 
+- In [Make](https://www.make.com/en) an automation runs that picks up new screenshots, and sends a webhook to this service when that happens. 
+- When this service is triggered, it sends the screenshot to the Athropic API with the request to extract the difficulty level and solving time from it. 
+- The result is stored in a database. 
+- The database is available in Grafana, my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
 
 ## Architecture Overview
 
