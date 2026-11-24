@@ -2,11 +2,13 @@ import base64
 
 from anthropic import Anthropic
 from anthropic.types import (
+    AssistantMessageParam,
     Base64ImageSourceParam,
     ImageBlockParam,
     MessageParam,
     TextBlock,
     TextBlockParam,
+    UserMessageParam,
 )
 
 from google_utils import get_secret
@@ -44,8 +46,8 @@ def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
     client = Anthropic(api_key=get_secret("claude-api-key"))
     file_content = base64.b64encode(file_bytes).decode("utf-8")
 
-    messages = [
-        MessageParam(
+    messages: list[MessageParam] = [
+        UserMessageParam(
             role="user",
             content=[
                 TextBlockParam(type="text", text=_get_claude_prompt()),
@@ -59,7 +61,7 @@ def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
                 ),
             ],
         ),
-        MessageParam(role="assistant", content="{"),
+        AssistantMessageParam(role="assistant", content="{"),
     ]
 
     message = client.messages.create(
