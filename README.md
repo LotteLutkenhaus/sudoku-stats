@@ -14,9 +14,9 @@ This application processes screenshots of completed NYT Sudoku puzzles through t
 
 ## Tech Stack
 
-- **Runtime**: Python 3.12 with Functions Framework
+- **Runtime**: Python 3.14 with Functions Framework
 - **Deployment**: Google Cloud Run (containerized with Docker)
-- **AI/ML**: Claude 3.5 Haiku for image processing
+- **AI/ML**: Claude 4.5 Haiku for image processing
 - **Database**: PostgreSQL (Neon hosted)
 - **Storage**: Google Drive API for screenshot retrieval
 - **Authentication**: Google Secret Manager for credentials

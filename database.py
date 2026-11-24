@@ -3,7 +3,7 @@ import os
 from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import timedelta
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import (
     Column,
@@ -62,7 +62,7 @@ def get_database_url() -> str:
 
 
 @contextmanager
-def get_db_session() -> Generator[Session, Any, None]:
+def get_db_session() -> Generator[Session, Any]:
     """
     Context manager for database sessions.
     """
@@ -100,7 +100,7 @@ def insert_sudoku_result(
 
         session.add(puzzle_solution)
         session.flush()
-        puzzle_id: int = puzzle_solution.id
+        puzzle_id = cast(int, puzzle_solution.id)
 
         logger.info(f"Inserted puzzle solution with ID: {puzzle_id}")
         return puzzle_id
