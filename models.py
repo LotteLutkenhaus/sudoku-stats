@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, BeforeValidator, Field
 
@@ -9,10 +9,6 @@ class SudokuDifficulty(StrEnum):
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
-
-
-class WebhookPayload(BaseModel):
-    file_id: str
 
 
 def get_solved_time_in_seconds(value: str) -> int:
@@ -26,6 +22,19 @@ def parse_googles_funky_timestamp(value: str) -> datetime:
 
 def uncapitalize_string(value: str) -> str:
     return value.lower()
+
+
+class WebhookPayload(BaseModel):
+    file_id: str
+
+
+class ClaudeSudokuExtraction(BaseModel):
+    """
+    Structured output schema for Claude.
+    """
+
+    difficulty_level: Literal["Easy", "Medium", "Hard"]
+    time_to_solve: Annotated[str, Field(pattern=r"^\d+:\d{2}$")]
 
 
 class ParsedSudokuResult(BaseModel):
