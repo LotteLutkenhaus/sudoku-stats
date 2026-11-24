@@ -60,7 +60,7 @@ def _prepare_image_for_claude(file_bytes: bytes) -> bytes:
     # Convert to JPEG format for the Claude API
     buffer = io.BytesIO()
     try:
-        image.save(buffer, format="JPEG", quality=85)
+        image.convert("RGB").save(buffer, format="JPEG", quality=85)
     except Exception as e:
         raise ValueError("Failed to convert image to JPEG") from e
 
