@@ -11,10 +11,6 @@ class SudokuDifficulty(StrEnum):
     HARD = "hard"
 
 
-class WebhookPayload(BaseModel):
-    file_id: str
-
-
 def get_solved_time_in_seconds(value: str) -> int:
     minutes, seconds = map(int, value.split(":"))
     return (minutes * 60) + seconds
@@ -26,6 +22,10 @@ def parse_googles_funky_timestamp(value: str) -> datetime:
 
 def uncapitalize_string(value: str) -> str:
     return value.lower()
+
+
+class WebhookPayload(BaseModel):
+    file_id: str
 
 
 class ClaudeSudokuExtraction(BaseModel):
