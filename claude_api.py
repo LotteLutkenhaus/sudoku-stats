@@ -2,41 +2,20 @@ import base64
 
 from anthropic import Anthropic
 from anthropic.types import (
-    AssistantMessageParam,
     Base64ImageSourceParam,
     ImageBlockParam,
     MessageParam,
-    TextBlock,
     TextBlockParam,
     UserMessageParam,
 )
 
 from google_utils import get_secret
-from models import ParsedSudokuResult
+from models import ClaudeSudokuExtraction, ParsedSudokuResult
 
 
 def _get_claude_prompt() -> str:
     return """This is a screenshot of the New York Times games app, of a finished Sudoku.
-    Extract the difficulty level and completion time from the image.
-
-    Return ONLY a JSON object with this structure, and nothing else:
-    {
-        "difficulty_level": "the difficulty level shown in the image",
-        "time_to_solve": "the completion time shown in the image"
-    }"""
-
-
-def _parse_claude_response(raw_response: str) -> ParsedSudokuResult:
-    """
-    Parse Claude's response to our message
-
-    Because we use prefilling the response via the 'assistent' role in the prompt, we should get
-    back something like this:
-    `'\n    "difficulty_level": "Hard",\n    "time_to_solve": "12:37"\n}'`
-    """
-    full_json = "{" + raw_response
-    parsed_response: ParsedSudokuResult = ParsedSudokuResult.model_validate_json(full_json.strip())
-    return parsed_response
+    Extract the difficulty level and completion time from the image."""
 
 
 def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
@@ -61,16 +40,20 @@ def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
                 ),
             ],
         ),
-        AssistantMessageParam(role="assistant", content="{"),
     ]
 
-    message = client.messages.create(
+    message = client.messages.parse(
         model="claude-haiku-4-5",  # cheapest available model, but up to the task
         max_tokens=100,
         messages=messages,
+        output_format=ClaudeSudokuExtraction,
     )
 
-    assert len(message.content) == 1, "Claude sent us multiple responses which we didn't expect"
-    content = message.content[0]
-    assert isinstance(content, TextBlock), "Claude returned something else than expected"
-    return _parse_claude_response(content.text)
+    if message.stop_reason != "end_turn":
+        raise ValueError(f"Claude stopped unexpectedly (stop_reason={message.stop_reason!r})")
+
+    extraction = message.parsed_output
+    if extraction is None:
+        raise ValueError("Claude did not return a structured output")
+
+    return ParsedSudokuResult.model_validate(extraction.model_dump())
