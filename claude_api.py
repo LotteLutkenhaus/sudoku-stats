@@ -43,8 +43,9 @@ def process_screenshot(file_bytes: bytes) -> ParsedSudokuResult:
     ]
 
     message = client.messages.parse(
-        model="claude-haiku-4-5",  # cheapest available model, but up to the task
-        max_tokens=100,
+        model="claude-haiku-5-5",  # cheapest available model
+        max_tokens=1024,
+        output_config={"effort": "low"},  # enough for parsing a screenshot
         messages=messages,
         output_format=ClaudeSudokuExtraction,
     )
