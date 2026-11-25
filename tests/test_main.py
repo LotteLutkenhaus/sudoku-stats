@@ -59,3 +59,12 @@ def test_processes_screenshot_and_stores_result(mocks: dict[str, MagicMock]) -> 
         parsed_result=mocks["process_screenshot"].return_value,
         screenshot_metadata=mocks["get_file_metadata"].return_value,
     )
+
+
+def test_returns_success_when_result_already_recorded(mocks: dict[str, MagicMock]) -> None:
+    mocks["insert_sudoku_result"].return_value = None
+
+    body, status = _call_handler({"X-API-Key": API_KEY})
+
+    assert status == 200
+    assert body == {"message": "Already recorded"}
