@@ -1,13 +1,8 @@
 # Sudoku Stats Tracker
 
 A serverless application that automatically tracks and stores completion statistics for the Sudoku puzzle in the [New York Times games](https://www.nytco.com/games/) mobile app. 
-
-How I use this: 
-- After solving the daily puzzle, I upload a screenshot of the results screen to Google Drive. 
-- In [Make](https://www.make.com/en) an automation runs that picks up new screenshots, and sends a webhook to this service when that happens. 
-- When this service is triggered, it sends the screenshot to the Anthropic API with the request to extract the difficulty level and solving time from it. 
-- The result is stored in a database. 
-- The database is available in Grafana, my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
+ 
+The database is available in Grafana, my personal dashboard can be found [here](https://sudokutracker.grafana.net/public-dashboards/021f11e0932e4ed6b98887bf008fc8de) 📈. 
 
 ![Grafana dashboard with Sudoku solving times](docs/dashboard.png)
 
@@ -16,14 +11,14 @@ How I use this:
 This application processes screenshots of completed NYT Sudoku puzzles through the following workflow:
 1. Screenshots are uploaded to Google Drive (uploading this is a manual step. Preferably they are retrieved from Google Photos directly, but the scopes needed for that were removed from the API early 2025.)
 2. A webhook triggers the Cloud Run service (I'm using Make (free tier) which triggers whenever a new screenshot is uploaded in a specific folder.)
-3. Claude AI extracts difficulty level and completion time from the screenshot
+3. The screenshot is sent to Claude/Anthropic AI to extract the difficulty level and the completion time. 
 4. Results are stored in a PostgreSQL database (hosted via Neon)
 
 ## Tech Stack
 
 - **Runtime**: Python 3.14 with Functions Framework
 - **Deployment**: Google Cloud Run (containerized with Docker)
-- **AI/ML**: Claude 4.5 Haiku for image processing
+- **AI/ML**: Claude 5.5 Haiku for image processing
 - **Database**: PostgreSQL (Neon hosted)
 - **Storage**: Google Drive API for screenshot retrieval
 - **Authentication**: Google Secret Manager for credentials
@@ -123,6 +118,25 @@ pip install -r requirements.txt
 
 # Run with Functions Framework
 functions-framework --target=process_sudoku_screenshot --debug
+```
+
+### Tests and Code Quality
+```bash
+# Install development tools and the pre-commit hook (runs ruff and mypy on every commit)
+pip install -r requirements-dev.txt
+pre-commit install
+
+# Run the tests
+pytest
+```
+
+CI runs the same checks (ruff, mypy, pytest) on every push and pull request.
+
+The Claude integration test calls the real API (costs a small amount) so it is skipped by default. It's useful for checking if extraction of the values from the screenshot works correctly. 
+To run it:
+
+```bash
+RUN_CLAUDE_TESTS=1 ANTHROPIC_API_KEY=... pytest tests/test_claude_api_integration.py
 ```
 
 ### Environment Configuration
