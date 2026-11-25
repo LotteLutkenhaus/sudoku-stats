@@ -21,6 +21,10 @@ def process_sudoku_screenshot(request: Request) -> tuple[dict[str, str], int]:
     file = get_screenshot(file_id=payload.file_id)
     parsed_sudoku_result = process_screenshot(file)
     file_metadata = get_file_metadata(file_id=payload.file_id)
-    insert_sudoku_result(parsed_result=parsed_sudoku_result, screenshot_metadata=file_metadata)
+    puzzle_id = insert_sudoku_result(
+        parsed_result=parsed_sudoku_result, screenshot_metadata=file_metadata
+    )
+    if puzzle_id is None:
+        return ({"message": "Already recorded"}), 200
 
     return ({"message": "Success"}), 200

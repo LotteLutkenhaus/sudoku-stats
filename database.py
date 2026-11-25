@@ -8,13 +8,16 @@ from typing import Any, cast
 from sqlalchemy import (
     Column,
     DateTime,
+    Index,
     Integer,
     Interval,
     String,
     create_engine,
     func,
 )
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.sql.dml import ReturningInsert
 
 from google_utils import get_secret
 from models import ParsedSudokuResult, ScreenshotMetadata
@@ -29,6 +32,9 @@ class PuzzleSolution(Base):  # type: ignore[valid-type,misc]
     """SQLAlchemy model for puzzle solutions table."""
 
     __tablename__ = "puzzle_solutions"
+    __table_args__ = (
+        Index("idx_puzzle_solutions_unique_solve", "solved_at", "difficulty", unique=True),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     solved_at = Column(DateTime(timezone=True), nullable=False)
@@ -82,24 +88,29 @@ def get_db_session() -> Generator[Session, Any]:
 
 def insert_sudoku_result(
     parsed_result: ParsedSudokuResult, screenshot_metadata: ScreenshotMetadata
-) -> int:
+) -> int | None:
     """
     Insert a new sudoku result into the PostgreSQL database.
     """
-    with get_db_session() as session:
-        # Convert seconds to timedelta for PostgreSQL interval
-        solving_time = timedelta(seconds=parsed_result.time_to_solve)
+    # Convert seconds to timedelta for PostgreSQL interval
+    solving_time = timedelta(seconds=parsed_result.time_to_solve)
 
-        # Create new puzzle solution record
-        puzzle_solution = PuzzleSolution(
+    statement: ReturningInsert[tuple[int]] = (
+        insert(PuzzleSolution)
+        .values(
             solved_at=screenshot_metadata.metadata.time,
             time_to_solve=solving_time,
             difficulty=parsed_result.difficulty_level.value,
         )
+        .on_conflict_do_nothing(index_elements=["solved_at", "difficulty"])
+        .returning(PuzzleSolution.id)
+    )
 
-        session.add(puzzle_solution)
-        session.flush()
-        puzzle_id = cast(int, puzzle_solution.id)
+    with get_db_session() as session:
+        puzzle_id = cast(int | None, session.execute(statement).scalar_one_or_none())
 
+    if puzzle_id is None:
+        logger.info("Puzzle solution already recorded, skipping")
+    else:
         logger.info(f"Inserted puzzle solution with ID: {puzzle_id}")
-        return puzzle_id
+    return puzzle_id

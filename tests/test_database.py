@@ -43,6 +43,23 @@ def test_insert_sudoku_result_stores_solution(database_url: str) -> None:
         assert solution.created_at is not None
 
 
+def test_insert_sudoku_result_skips_already_recorded_solve(database_url: str) -> None:
+    parsed_result = ParsedSudokuResult.model_validate(
+        {"difficulty_level": "Hard", "time_to_solve": "16:56"}
+    )
+    metadata = ScreenshotMetadata.model_validate(
+        {"imageMediaMetadata": {"time": "2026:11:16 07:54:44"}}
+    )
+
+    first_id = insert_sudoku_result(parsed_result=parsed_result, screenshot_metadata=metadata)
+    second_id = insert_sudoku_result(parsed_result=parsed_result, screenshot_metadata=metadata)
+
+    assert first_id is not None
+    assert second_id is None
+    with get_db_session() as session:
+        assert len(session.execute(select(PuzzleSolution)).all()) == 1
+
+
 def test_get_db_session_rolls_back_on_error(database_url: str) -> None:
     with pytest.raises(RuntimeError), get_db_session() as session:
         session.add(
